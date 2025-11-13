@@ -1,6 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 import { ExternalLink, TrendingUp } from "lucide-react";
 
 const sampleAssets = [
@@ -89,9 +90,11 @@ export const MarketplacePreview = () => {
         </div>
 
         <div className="text-center mt-12">
-          <Button variant="hero" size="lg">
-            Explore Marketplace
-          </Button>
+          <Link to="/marketplace">
+            <Button variant="hero" size="lg">
+              Explore Marketplace
+            </Button>
+          </Link>
         </div>
       </div>
     </section>
