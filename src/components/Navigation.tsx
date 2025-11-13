@@ -1,8 +1,26 @@
 import { Button } from "@/components/ui/button";
 import { Wallet, Menu } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useWeb3Modal } from '@web3modal/wagmi/react';
+import { useAccount, useDisconnect } from 'wagmi';
 
 export const Navigation = () => {
+  const { open } = useWeb3Modal();
+  const { address, isConnected } = useAccount();
+  const { disconnect } = useDisconnect();
+
+  const handleWalletAction = () => {
+    if (isConnected) {
+      disconnect();
+    } else {
+      open();
+    }
+  };
+
+  const formatAddress = (addr: string) => {
+    return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
+  };
+
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 glass border-b border-border/50">
       <div className="container mx-auto px-6 py-4">
@@ -25,9 +43,9 @@ export const Navigation = () => {
           </div>
 
           <div className="flex items-center gap-3">
-            <Button variant="glass" size="default">
+            <Button variant="glass" size="default" onClick={handleWalletAction}>
               <Wallet className="w-4 h-4" />
-              Connect Wallet
+              {isConnected && address ? formatAddress(address) : 'Connect Wallet'}
             </Button>
             <Button variant="ghost" size="icon" className="md:hidden">
               <Menu className="w-5 h-5" />
