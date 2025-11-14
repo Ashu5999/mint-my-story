@@ -5,6 +5,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Search, Filter } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { LicenseDialog } from "@/components/LicenseDialog";
+import { FilterSheet } from "@/components/FilterSheet";
+import { useState } from "react";
 
 const sampleAssets = [
   {
@@ -64,6 +67,16 @@ const sampleAssets = [
 ];
 
 const Marketplace = () => {
+  const [selectedAsset, setSelectedAsset] = useState<typeof sampleAssets[0] | null>(null);
+  const [filterOpen, setFilterOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredAssets = sampleAssets.filter(asset =>
+    asset.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    asset.creator.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    asset.category.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <div className="min-h-screen">
       <Navigation />
@@ -85,16 +98,18 @@ const Marketplace = () => {
                 <Input
                   placeholder="Search assets..."
                   className="pl-10 glass"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                 />
               </div>
-              <Button variant="glass">
+              <Button variant="glass" onClick={() => setFilterOpen(true)}>
                 <Filter className="w-4 h-4" />
                 Filters
               </Button>
             </div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {sampleAssets.map((asset) => (
+              {filteredAssets.map((asset) => (
                 <Card key={asset.id} className="glass overflow-hidden hover:scale-105 transition-smooth">
                   <div className="relative h-48 overflow-hidden">
                     <img
@@ -114,7 +129,7 @@ const Marketplace = () => {
                         <p className="text-sm text-foreground/60">Price</p>
                         <p className="font-bold gradient-text">{asset.price}</p>
                       </div>
-                      <Button variant="hero" size="sm">
+                      <Button variant="hero" size="sm" onClick={() => setSelectedAsset(asset)}>
                         License
                       </Button>
                     </div>
@@ -129,6 +144,16 @@ const Marketplace = () => {
         </section>
       </main>
       <Footer />
+      
+      {selectedAsset && (
+        <LicenseDialog
+          open={!!selectedAsset}
+          onOpenChange={(open) => !open && setSelectedAsset(null)}
+          asset={selectedAsset}
+        />
+      )}
+      
+      <FilterSheet open={filterOpen} onOpenChange={setFilterOpen} />
     </div>
   );
 };

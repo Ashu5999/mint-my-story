@@ -134,7 +134,7 @@ export async function uploadMedia(
         const mimeType = detectMimeType(filename);
         
         console.log(`Converting Buffer to File object: ${filename}`);
-        fileToUpload = new File([file], filename, { type: mimeType });
+        fileToUpload = new File([new Uint8Array(file)], filename, { type: mimeType });
       } 
       // Handle File objects (browser environment)
       else if (file instanceof File) {
@@ -200,7 +200,7 @@ export async function uploadMediaWithDetails(
       if (Buffer.isBuffer(file)) {
         const filename = `media_${Date.now()}_${i}.jpg`;
         mimeType = detectMimeType(filename);
-        fileToUpload = new File([file], filename, { type: mimeType });
+        fileToUpload = new File([new Uint8Array(file)], filename, { type: mimeType });
       } else if (file instanceof File) {
         fileToUpload = file;
         mimeType = file.type || detectMimeType(file.name);

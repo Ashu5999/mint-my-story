@@ -16,7 +16,6 @@ import { privateKeyToAccount } from 'viem/accounts';
 import {
   StoryClient,
   type StoryConfig,
-  storyTestnet,
 } from '@story-protocol/core-sdk';
 
 export interface RoyaltySplit {
@@ -93,7 +92,7 @@ async function getStoryClient(): Promise<StoryClient> {
         const account = privateKeyToAccount(`0x${privateKey.replace(/^0x/, '')}`);
 
         const config: StoryConfig = {
-          chainId: storyTestnet.id,
+          chainId: "aeneid", // Story Protocol testnet
           transport: http(rpcUrl),
           account,
         };
@@ -186,9 +185,7 @@ export async function registerAsset(
       if (royalties && royalties.length > 0) {
         const royaltyResult = await setRoyaltyConfig(assetId, royalties);
         if (!royaltyResult.success) {
-          console.error('[Story] Failed to set royalty config during registerAsset:',
-            royaltyResult.error,
-          );
+          console.error('[Story] Failed to set royalty config during registerAsset');
         }
       }
     }
