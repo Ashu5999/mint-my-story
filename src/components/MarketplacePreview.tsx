@@ -80,10 +80,12 @@ export const MarketplacePreview = () => {
                   <p className="text-xs text-muted-foreground">{asset.licenses} licenses sold</p>
                 </div>
 
-                <Button variant="outline" className="w-full group/btn">
-                  View Details
-                  <ExternalLink className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
-                </Button>
+                <Link to={`/marketplace/${asset.id}`}>
+                  <Button variant="outline" className="w-full group/btn">
+                    View Details
+                    <ExternalLink className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
+                  </Button>
+                </Link>
               </CardContent>
             </Card>
           ))}
