@@ -5,6 +5,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Web3Provider } from "@/components/Web3Provider";
 import Index from "./pages/Index";
 import Marketplace from "./pages/Marketplace";
+import AssetDetail from "./pages/AssetDetail";
 import Dashboard from "./pages/Dashboard";
 import HowItWorksPage from "./pages/HowItWorksPage";
 import NotFound from "./pages/NotFound";
@@ -18,6 +19,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/marketplace" element={<Marketplace />} />
+          <Route path="/marketplace/:id" element={<AssetDetail />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/how-it-works" element={<HowItWorksPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
