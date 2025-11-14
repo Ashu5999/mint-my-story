@@ -81,6 +81,9 @@ All colors MUST be HSL.
   body {
     @apply bg-background text-foreground antialiased;
     font-feature-settings: "cv11", "ss01";
+    /* Global subtle 3D gradient background */
+    background-image: var(--gradient-subtle);
+    background-attachment: fixed;
   }
 
   /* Smooth scrolling */
@@ -132,5 +135,63 @@ All colors MUST be HSL.
 
   .transition-bounce {
     transition: var(--transition-bounce);
+  }
+
+  /* 3D card and tilt effects */
+  .card-3d {
+    background:
+      radial-gradient(circle at 0% 0%, hsl(263 70% 60% / 0.18) 0, transparent 55%),
+      radial-gradient(circle at 100% 100%, hsl(217 91% 60% / 0.22) 0, transparent 55%),
+      hsl(var(--card));
+    box-shadow: var(--shadow-md);
+    transform-style: preserve-3d;
+    transform: translateZ(0);
+  }
+
+  .card-3d:hover {
+    box-shadow: var(--shadow-lg), var(--shadow-glow);
+    transform: translateY(-8px) translateZ(20px);
+  }
+
+  .tilt-soft {
+    transform: perspective(1100px) rotateX(6deg) rotateY(-6deg);
+    transform-origin: center;
+  }
+
+  .tilt-soft:hover {
+    transform: perspective(1100px) rotateX(0deg) rotateY(0deg) translateY(-6px);
+  }
+
+  /* Hero-specific layered background helpers */
+  .hero-depth {
+    position: relative;
+    isolation: isolate;
+    perspective: 1400px;
+  }
+
+  .hero-orbit {
+    position: absolute;
+    inset: -10%;
+    background:
+      radial-gradient(circle at 0% 0%, hsl(263 70% 60% / 0.18) 0, transparent 55%),
+      radial-gradient(circle at 100% 20%, hsl(217 91% 60% / 0.16) 0, transparent 60%),
+      radial-gradient(circle at 50% 120%, hsl(263 70% 60% / 0.18) 0, transparent 60%);
+    opacity: 0.9;
+    mix-blend-mode: screen;
+    transform: translateZ(-40px) scale(1.05);
+    filter: blur(2px);
+  }
+
+  .hero-grid {
+    position: absolute;
+    inset: 10% 5% auto 5%;
+    height: 260px;
+    background-image:
+      linear-gradient(hsl(217 33% 24% / 0.6) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(217 33% 24% / 0.6) 1px, transparent 1px);
+    background-size: 28px 28px;
+    opacity: 0.32;
+    transform: rotateX(60deg) translateZ(-20px);
+    transform-origin: top center;
   }
 }

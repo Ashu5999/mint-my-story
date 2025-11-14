@@ -55,8 +55,11 @@ export const MarketplacePreview = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
           {sampleAssets.map((asset) => (
-            <Card key={asset.id} className="glass border-border/50 overflow-hidden group hover:border-primary/50 transition-smooth">
-              <div className="aspect-square overflow-hidden">
+            <Card
+              key={asset.id}
+              className="glass card-3d border-border/50 overflow-hidden group hover:border-primary/50 transition-smooth"
+            >
+              <div className="aspect-square overflow-hidden tilt-soft">
                 <img
                   src={asset.image}
                   alt={asset.title}

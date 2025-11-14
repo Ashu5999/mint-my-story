@@ -41,14 +41,14 @@ export const HowItWorks = () => {
 
             {steps.map((step, index) => (
               <div key={index} className="relative">
-                <div className="glass p-8 rounded-2xl hover:bg-card/80 transition-smooth group">
+                <div className="glass card-3d p-8 rounded-2xl hover:bg-card/80 transition-smooth group">
                   {/* Number Badge */}
-                  <div className="absolute -top-4 -left-4 w-12 h-12 bg-gradient-to-br from-brand-purple to-brand-blue rounded-xl flex items-center justify-center font-bold text-lg shadow-lg group-hover:scale-110 transition-smooth">
+                  <div className="absolute -top-4 -left-4 w-12 h-12 bg-gradient-to-br from-brand-purple to-brand-blue rounded-xl flex items-center justify-center font-bold text-lg shadow-lg group-hover:scale-110 transition-smooth tilt-soft">
                     {step.number}
                   </div>
 
                   {/* Icon */}
-                  <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-smooth">
+                  <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-smooth tilt-soft">
                     <step.icon className="w-8 h-8 text-brand-purple" />
                   </div>
 
