@@ -1,13 +1,31 @@
 import { Button } from "@/components/ui/button";
-import { Wallet, Menu } from "lucide-react";
+import { Wallet, Menu, LogIn } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useWeb3Modal } from '@web3modal/wagmi/react';
 import { useAccount, useDisconnect } from 'wagmi';
+import { supabase } from "@/integrations/supabase/client";
+import { useEffect, useState } from "react";
+import { User } from "@supabase/supabase-js";
 
 export const Navigation = () => {
   const { open } = useWeb3Modal();
   const { address, isConnected } = useAccount();
   const { disconnect } = useDisconnect();
+  const [user, setUser] = useState<User | null>(null);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   const handleWalletAction = () => {
     if (isConnected) {
@@ -43,6 +61,14 @@ export const Navigation = () => {
           </div>
 
           <div className="flex items-center gap-3">
+            {!user && (
+              <Link to="/auth">
+                <Button variant="glass" size="default">
+                  <LogIn className="w-4 h-4" />
+                  Sign In
+                </Button>
+              </Link>
+            )}
             <Button variant="glass" size="default" onClick={handleWalletAction}>
               <Wallet className="w-4 h-4" />
               {isConnected && address ? formatAddress(address) : 'Connect Wallet'}
