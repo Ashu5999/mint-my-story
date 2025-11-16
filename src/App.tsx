@@ -8,6 +8,7 @@ import Marketplace from "./pages/Marketplace";
 import AssetDetail from "./pages/AssetDetail";
 import Dashboard from "./pages/Dashboard";
 import HowItWorksPage from "./pages/HowItWorksPage";
+import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 
 const App = () => (
@@ -22,6 +23,7 @@ const App = () => (
           <Route path="/marketplace/:id" element={<AssetDetail />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/how-it-works" element={<HowItWorksPage />} />
+          <Route path="/auth" element={<Auth />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
