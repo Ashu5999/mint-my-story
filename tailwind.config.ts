@@ -61,6 +61,9 @@ export default {
           purple: "hsl(var(--brand-purple))",
           blue: "hsl(var(--brand-blue))",
           glow: "hsl(var(--brand-glow))",
+          indigo: "hsl(var(--brand-indigo))",
+          teal: "hsl(var(--brand-teal))",
+          charcoal: "hsl(var(--brand-charcoal))",
         },
       },
       borderRadius: {
