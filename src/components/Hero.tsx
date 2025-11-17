@@ -83,13 +83,13 @@ export const Hero = () => {
           </div>
 
           {/* Right: 3D floating centerpiece */}
-          <div className="relative h-[500px] md:h-[600px] lg:h-[700px]">
+          <div className="relative h-[600px] md:h-[750px] lg:h-[850px]">
             <div className="absolute inset-0 flex items-center justify-center">
               {/* Main 3D floating book/card stack */}
               <div className="relative w-full max-w-md h-full">
                 {/* Card 1 - Top */}
                 <div 
-                  className="glass card-3d rounded-3xl p-8 absolute top-0 left-1/2 -translate-x-1/2 w-[85%] z-30 float-3d"
+                  className="glass card-3d rounded-3xl p-6 md:p-8 absolute top-0 left-1/2 -translate-x-1/2 w-[90%] md:w-[85%] z-30 float-3d"
                   style={{ animationDelay: '0s' }}
                 >
                   <div className="flex items-start gap-4">
@@ -112,7 +112,7 @@ export const Hero = () => {
 
                 {/* Card 2 - Middle */}
                 <div 
-                  className="glass card-3d rounded-3xl p-8 absolute top-36 left-1/2 -translate-x-1/2 w-[90%] z-20 float-3d"
+                  className="glass card-3d rounded-3xl p-6 md:p-8 absolute top-44 md:top-48 left-1/2 -translate-x-1/2 w-[92%] md:w-[90%] z-20 float-3d"
                   style={{ animationDelay: '2.6s' }}
                 >
                   <div className="flex items-start gap-4">
@@ -135,7 +135,7 @@ export const Hero = () => {
 
                 {/* Card 3 - Bottom */}
                 <div 
-                  className="glass card-3d rounded-3xl p-8 absolute top-72 left-1/2 -translate-x-1/2 w-[95%] z-10 float-3d"
+                  className="glass card-3d rounded-3xl p-6 md:p-8 absolute top-[22rem] md:top-96 left-1/2 -translate-x-1/2 w-[94%] md:w-[95%] z-10 float-3d"
                   style={{ animationDelay: '5.2s' }}
                 >
                   <div className="flex items-start gap-4">
