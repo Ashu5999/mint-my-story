@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -16,21 +16,39 @@ export default function Auth() {
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  // Check if user is already logged in
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        navigate("/dashboard");
+      }
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' && session) {
+        navigate("/dashboard");
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [navigate]);
+
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
       if (isLogin) {
-        const { error } = await supabase.auth.signInWithPassword({
+        const { data, error } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
         if (error) throw error;
-        toast({ title: "Welcome back!" });
-        navigate("/dashboard");
+        if (data.user) {
+          toast({ title: "Welcome back!" });
+        }
       } else {
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
@@ -38,15 +56,28 @@ export default function Auth() {
           },
         });
         if (error) throw error;
-        toast({
-          title: "Account created!",
-          description: "Check your email to verify your account.",
-        });
+        if (data.user) {
+          toast({
+            title: "Account created successfully!",
+            description: "You're now signed in.",
+          });
+        }
       }
     } catch (error: any) {
+      let errorMessage = error.message;
+      
+      // Handle common errors with user-friendly messages
+      if (errorMessage.includes("Invalid login credentials")) {
+        errorMessage = "Invalid email or password. Please try again.";
+      } else if (errorMessage.includes("User already registered")) {
+        errorMessage = "This email is already registered. Please sign in instead.";
+      } else if (errorMessage.includes("Email not confirmed")) {
+        errorMessage = "Please check your email to confirm your account.";
+      }
+      
       toast({
-        title: "Error",
-        description: error.message,
+        title: "Authentication Error",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
@@ -63,10 +94,15 @@ export default function Auth() {
           redirectTo: `${window.location.origin}/dashboard`,
         },
       });
-      if (error) throw error;
+      if (error) {
+        if (error.message.includes("provider is not enabled")) {
+          throw new Error("Google sign-in is not enabled. Please contact support or use email/password.");
+        }
+        throw error;
+      }
     } catch (error: any) {
       toast({
-        title: "Error",
+        title: "Google Sign-In Error",
         description: error.message,
         variant: "destructive",
       });
