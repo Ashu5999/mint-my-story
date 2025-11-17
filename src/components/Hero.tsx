@@ -83,75 +83,72 @@ export const Hero = () => {
           </div>
 
           {/* Right: 3D floating centerpiece */}
-          <div className="relative h-[600px] md:h-[750px] lg:h-[850px]">
-            <div className="absolute inset-0 flex items-center justify-center">
-              {/* Main 3D floating book/card stack */}
-              <div className="relative w-full max-w-md h-full">
-                {/* Card 1 - Top */}
-                <div 
-                  className="glass card-3d rounded-3xl p-6 md:p-8 absolute top-0 left-1/2 -translate-x-1/2 w-[90%] md:w-[85%] z-30 float-3d"
-                  style={{ animationDelay: '0s' }}
-                >
-                  <div className="flex items-start gap-4">
-                    <div className="w-14 h-14 bg-brand-teal/20 rounded-2xl flex items-center justify-center glow">
-                      <BookOpen className="w-7 h-7 text-brand-teal" />
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="font-bold text-lg mb-2">Holographic Stories</h3>
-                      <p className="text-sm text-muted-foreground leading-relaxed">
-                        Your content becomes immutable, blockchain-verified intellectual property
-                      </p>
-                      <div className="mt-4 flex gap-2">
-                        <div className="h-1.5 w-12 bg-brand-teal/60 rounded-full glow" />
-                        <div className="h-1.5 w-8 bg-brand-indigo/40 rounded-full" />
-                        <div className="h-1.5 w-6 bg-brand-teal/30 rounded-full" />
-                      </div>
+          <div className="relative min-h-[400px] md:min-h-[500px]">
+            <div className="flex flex-col lg:flex-row items-center justify-center gap-6 lg:gap-8">
+              {/* Card 1 - Holographic Stories */}
+              <div 
+                className="glass card-3d rounded-3xl p-6 md:p-8 w-full max-w-sm float-3d"
+                style={{ animationDelay: '0s' }}
+              >
+                <div className="flex flex-col items-center text-center gap-4">
+                  <div className="w-14 h-14 bg-brand-teal/20 rounded-2xl flex items-center justify-center glow">
+                    <BookOpen className="w-7 h-7 text-brand-teal" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-bold text-lg mb-2">Holographic Stories</h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      Your content becomes immutable, blockchain-verified intellectual property
+                    </p>
+                    <div className="mt-4 flex gap-2 justify-center">
+                      <div className="h-1.5 w-12 bg-brand-teal/60 rounded-full glow" />
+                      <div className="h-1.5 w-8 bg-brand-indigo/40 rounded-full" />
+                      <div className="h-1.5 w-6 bg-brand-teal/30 rounded-full" />
                     </div>
                   </div>
                 </div>
+              </div>
 
-                {/* Card 2 - Middle */}
-                <div 
-                  className="glass card-3d rounded-3xl p-6 md:p-8 absolute top-44 md:top-48 left-1/2 -translate-x-1/2 w-[92%] md:w-[90%] z-20 float-3d"
-                  style={{ animationDelay: '2.6s' }}
-                >
-                  <div className="flex items-start gap-4">
-                    <div className="w-14 h-14 bg-brand-indigo/20 rounded-2xl flex items-center justify-center glow-indigo">
-                      <Shield className="w-7 h-7 text-brand-indigo" />
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="font-bold text-lg mb-2">Smart Licensing</h3>
-                      <p className="text-sm text-muted-foreground leading-relaxed">
-                        Set terms once, automate royalties forever with programmable contracts
-                      </p>
-                      <div className="mt-4 flex gap-2">
-                        <div className="h-1.5 w-10 bg-brand-indigo/60 rounded-full glow-indigo" />
-                        <div className="h-1.5 w-14 bg-brand-teal/40 rounded-full" />
-                        <div className="h-1.5 w-6 bg-brand-indigo/30 rounded-full" />
-                      </div>
+              {/* Card 2 - Smart Licensing */}
+              <div 
+                className="glass card-3d rounded-3xl p-6 md:p-8 w-full max-w-sm float-3d"
+                style={{ animationDelay: '2.6s' }}
+              >
+                <div className="flex flex-col items-center text-center gap-4">
+                  <div className="w-14 h-14 bg-brand-indigo/20 rounded-2xl flex items-center justify-center glow-indigo">
+                    <Shield className="w-7 h-7 text-brand-indigo" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-bold text-lg mb-2">Smart Licensing</h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      Set terms once, automate royalties forever with programmable contracts
+                    </p>
+                    <div className="mt-4 flex gap-2 justify-center">
+                      <div className="h-1.5 w-10 bg-brand-indigo/60 rounded-full glow-indigo" />
+                      <div className="h-1.5 w-14 bg-brand-teal/40 rounded-full" />
+                      <div className="h-1.5 w-6 bg-brand-indigo/30 rounded-full" />
                     </div>
                   </div>
                 </div>
+              </div>
 
-                {/* Card 3 - Bottom */}
-                <div 
-                  className="glass card-3d rounded-3xl p-6 md:p-8 absolute top-[22rem] md:top-96 left-1/2 -translate-x-1/2 w-[94%] md:w-[95%] z-10 float-3d"
-                  style={{ animationDelay: '5.2s' }}
-                >
-                  <div className="flex items-start gap-4">
-                    <div className="w-14 h-14 bg-brand-teal/20 rounded-2xl flex items-center justify-center glow">
-                      <Zap className="w-7 h-7 text-brand-teal" />
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="font-bold text-lg mb-2">Monetize Creativity</h3>
-                      <p className="text-sm text-muted-foreground leading-relaxed">
-                        Earn from every license, remix, and derivative work automatically
-                      </p>
-                      <div className="mt-4 flex gap-2">
-                        <div className="h-1.5 w-8 bg-brand-teal/60 rounded-full glow" />
-                        <div className="h-1.5 w-12 bg-brand-indigo/40 rounded-full" />
-                        <div className="h-1.5 w-10 bg-brand-teal/30 rounded-full" />
-                      </div>
+              {/* Card 3 - Monetize Creativity */}
+              <div 
+                className="glass card-3d rounded-3xl p-6 md:p-8 w-full max-w-sm float-3d"
+                style={{ animationDelay: '5.2s' }}
+              >
+                <div className="flex flex-col items-center text-center gap-4">
+                  <div className="w-14 h-14 bg-brand-teal/20 rounded-2xl flex items-center justify-center glow">
+                    <Zap className="w-7 h-7 text-brand-teal" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-bold text-lg mb-2">Monetize Creativity</h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
+                      Earn from every license, remix, and derivative work automatically
+                    </p>
+                    <div className="mt-4 flex gap-2 justify-center">
+                      <div className="h-1.5 w-8 bg-brand-teal/60 rounded-full glow" />
+                      <div className="h-1.5 w-12 bg-brand-indigo/40 rounded-full" />
+                      <div className="h-1.5 w-10 bg-brand-teal/30 rounded-full" />
                     </div>
                   </div>
                 </div>
@@ -159,8 +156,8 @@ export const Hero = () => {
             </div>
 
             {/* Floating glow orbs behind cards */}
-            <div className="absolute top-1/4 -left-20 w-64 h-64 bg-brand-teal/20 rounded-full blur-[100px] glow" />
-            <div className="absolute bottom-1/4 -right-20 w-64 h-64 bg-brand-indigo/15 rounded-full blur-[100px] glow-indigo" />
+            <div className="absolute top-1/2 -left-20 w-64 h-64 bg-brand-teal/20 rounded-full blur-[100px] glow -z-10" />
+            <div className="absolute top-1/2 -right-20 w-64 h-64 bg-brand-indigo/15 rounded-full blur-[100px] glow-indigo -z-10" />
           </div>
         </div>
       </div>
