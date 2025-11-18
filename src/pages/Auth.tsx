@@ -95,15 +95,16 @@ export default function Auth() {
         },
       });
       if (error) {
-        if (error.message.includes("provider is not enabled")) {
-          throw new Error("Google sign-in is not enabled. Please contact support or use email/password.");
-        }
         throw error;
       }
     } catch (error: any) {
+      let errorMessage = error.message;
+      if (errorMessage.includes("provider is not enabled")) {
+        errorMessage = "Google sign-in is not configured. Please use email/password or contact support.";
+      }
       toast({
-        title: "Google Sign-In Error",
-        description: error.message,
+        title: "Sign-In Error",
+        description: errorMessage,
         variant: "destructive",
       });
       setLoading(false);

@@ -7,7 +7,20 @@ import { Search, Filter } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { LicenseDialog } from "@/components/LicenseDialog";
 import { FilterSheet } from "@/components/FilterSheet";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useNavigate } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
+
+interface Asset {
+  id: string;
+  title: string;
+  creator: string;
+  price: string;
+  category: string;
+  image: string;
+  licenses: number;
+}
 
 const sampleAssets = [
   {
@@ -67,11 +80,50 @@ const sampleAssets = [
 ];
 
 const Marketplace = () => {
-  const [selectedAsset, setSelectedAsset] = useState<typeof sampleAssets[0] | null>(null);
+  const [selectedAsset, setSelectedAsset] = useState<Asset | null>(null);
   const [filterOpen, setFilterOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [assets, setAssets] = useState<Asset[]>([]);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+  const { toast } = useToast();
 
-  const filteredAssets = sampleAssets.filter(asset =>
+  useEffect(() => {
+    fetchAssets();
+  }, []);
+
+  const fetchAssets = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('assets')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      const formattedAssets = data?.map(asset => ({
+        id: asset.id,
+        title: asset.title,
+        creator: `@creator_${asset.user_id.slice(0, 8)}`,
+        price: `${asset.price} ETH`,
+        category: asset.category,
+        image: asset.image_url || "https://images.unsplash.com/photo-1507525428034-b723cf961d3e",
+        licenses: asset.licenses_sold || 0,
+      })) || [];
+
+      setAssets(formattedAssets);
+    } catch (error: any) {
+      toast({
+        title: "Error Loading Assets",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const filteredAssets = assets.filter(asset =>
     asset.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     asset.creator.toLowerCase().includes(searchQuery.toLowerCase()) ||
     asset.category.toLowerCase().includes(searchQuery.toLowerCase())
@@ -108,38 +160,53 @@ const Marketplace = () => {
               </Button>
             </div>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredAssets.map((asset) => (
-                <Card key={asset.id} className="glass overflow-hidden hover:scale-105 transition-smooth">
-                  <div className="relative h-48 overflow-hidden">
-                    <img
-                      src={asset.image}
-                      alt={asset.title}
-                      className="w-full h-full object-cover"
-                    />
-                    <Badge className="absolute top-3 right-3 glass">
-                      {asset.category}
-                    </Badge>
-                  </div>
-                  <CardContent className="p-4">
-                    <h3 className="font-semibold text-lg mb-2">{asset.title}</h3>
-                    <p className="text-sm text-foreground/60 mb-3">{asset.creator}</p>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm text-foreground/60">Price</p>
-                        <p className="font-bold gradient-text">{asset.price}</p>
-                      </div>
-                      <Button variant="hero" size="sm" onClick={() => setSelectedAsset(asset)}>
-                        License
-                      </Button>
+            {loading ? (
+              <div className="text-center py-12">
+                <p className="text-muted-foreground">Loading assets...</p>
+              </div>
+            ) : filteredAssets.length === 0 ? (
+              <div className="text-center py-12">
+                <p className="text-muted-foreground">No assets found. Try adjusting your search.</p>
+              </div>
+            ) : (
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredAssets.map((asset) => (
+                  <Card key={asset.id} className="glass overflow-hidden hover:scale-105 transition-smooth">
+                    <div className="relative h-48 overflow-hidden">
+                      <img
+                        src={asset.image}
+                        alt={asset.title}
+                        className="w-full h-full object-cover"
+                      />
+                      <Badge className="absolute top-3 right-3 glass">
+                        {asset.category}
+                      </Badge>
                     </div>
-                    <p className="text-xs text-foreground/50 mt-3">
-                      {asset.licenses} active licenses
-                    </p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+                    <CardContent className="p-4">
+                      <h3 className="font-semibold text-lg mb-2">{asset.title}</h3>
+                      <p className="text-sm text-foreground/60 mb-3">{asset.creator}</p>
+                      <div className="flex items-center justify-between mb-3">
+                        <div>
+                          <p className="text-sm text-foreground/60">Price</p>
+                          <p className="font-bold gradient-text">{asset.price}</p>
+                        </div>
+                        <p className="text-xs text-foreground/50">
+                          {asset.licenses} licenses
+                        </p>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button variant="hero" size="sm" className="flex-1" onClick={() => setSelectedAsset(asset)}>
+                          License
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={() => navigate(`/marketplace/${asset.id}`)}>
+                          View
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
           </div>
         </section>
       </main>

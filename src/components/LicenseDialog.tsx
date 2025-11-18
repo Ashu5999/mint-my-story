@@ -2,12 +2,18 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { useAccount } from 'wagmi';
+import { useWeb3Modal } from '@web3modal/wagmi/react';
+import { useState } from "react";
+import { Loader2 } from "lucide-react";
 
 interface LicenseDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   asset: {
-    id: number;
+    id: string;
     title: string;
     creator: string;
     price: string;
@@ -18,9 +24,61 @@ interface LicenseDialogProps {
 }
 
 export const LicenseDialog = ({ open, onOpenChange, asset }: LicenseDialogProps) => {
-  const handlePurchase = () => {
-    // TODO: Implement wallet connection and purchase logic
-    console.log("Purchasing license for:", asset.title);
+  const { toast } = useToast();
+  const { address, isConnected } = useAccount();
+  const { open: openWalletModal } = useWeb3Modal();
+  const [loading, setLoading] = useState(false);
+
+  const handlePurchase = async () => {
+    setLoading(true);
+    
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast({
+          title: "Authentication Required",
+          description: "Please sign in to purchase licenses",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      if (!isConnected || !address) {
+        toast({
+          title: "Wallet Required",
+          description: "Please connect your wallet to complete the purchase",
+        });
+        openWalletModal?.();
+        return;
+      }
+
+      const priceValue = parseFloat(asset.price.replace(/[^0-9.]/g, ''));
+
+      const { error } = await supabase.from('licenses').insert({
+        asset_id: asset.id,
+        buyer_id: session.user.id,
+        buyer_wallet: address,
+        price_paid: priceValue,
+        transaction_hash: `mock-tx-${Date.now()}`
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "License Purchased!",
+        description: `You now have a license for ${asset.title}`,
+      });
+
+      onOpenChange(false);
+    } catch (error: any) {
+      toast({
+        title: "Purchase Failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -75,10 +133,11 @@ export const LicenseDialog = ({ open, onOpenChange, asset }: LicenseDialogProps)
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={loading}>
             Cancel
           </Button>
-          <Button variant="hero" onClick={handlePurchase}>
+          <Button variant="hero" onClick={handlePurchase} disabled={loading}>
+            {loading && <Loader2 className="w-4 h-4 animate-spin" />}
             Purchase License
           </Button>
         </DialogFooter>
