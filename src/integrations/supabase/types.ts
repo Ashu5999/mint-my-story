@@ -14,7 +14,86 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      assets: {
+        Row: {
+          category: string
+          created_at: string | null
+          description: string | null
+          id: string
+          image_url: string | null
+          licenses_sold: number | null
+          metadata: Json | null
+          price: number
+          title: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          category: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          licenses_sold?: number | null
+          metadata?: Json | null
+          price: number
+          title: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          category?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          licenses_sold?: number | null
+          metadata?: Json | null
+          price?: number
+          title?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      licenses: {
+        Row: {
+          asset_id: string
+          buyer_id: string
+          buyer_wallet: string | null
+          id: string
+          price_paid: number
+          purchased_at: string | null
+          transaction_hash: string | null
+        }
+        Insert: {
+          asset_id: string
+          buyer_id: string
+          buyer_wallet?: string | null
+          id?: string
+          price_paid: number
+          purchased_at?: string | null
+          transaction_hash?: string | null
+        }
+        Update: {
+          asset_id?: string
+          buyer_id?: string
+          buyer_wallet?: string | null
+          id?: string
+          price_paid?: number
+          purchased_at?: string | null
+          transaction_hash?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "licenses_asset_id_fkey"
+            columns: ["asset_id"]
+            isOneToOne: false
+            referencedRelation: "assets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
