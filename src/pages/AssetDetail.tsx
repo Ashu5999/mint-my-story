@@ -10,7 +10,7 @@ import { LicenseDialog } from "@/components/LicenseDialog";
 
 const sampleAssets = [
   {
-    id: 1,
+    id: "1",
     title: "Summer Sunset Collection",
     creator: "@creator_one",
     price: "0.05 ETH",
@@ -20,7 +20,7 @@ const sampleAssets = [
     description: "A stunning collection of summer sunset photographs capturing golden hour moments across various landscapes.",
   },
   {
-    id: 2,
+    id: "2",
     title: "Urban Street Style",
     creator: "@fashionista",
     price: "0.08 ETH",
@@ -30,7 +30,7 @@ const sampleAssets = [
     description: "Contemporary urban fashion photography showcasing modern street style and cultural trends.",
   },
   {
-    id: 3,
+    id: "3",
     title: "Food Photography Series",
     creator: "@foodie_creator",
     price: "0.03 ETH",
@@ -45,7 +45,7 @@ export default function AssetDetail() {
   const { id } = useParams();
   const [licenseDialogOpen, setLicenseDialogOpen] = useState(false);
   
-  const asset = sampleAssets.find((a) => a.id === Number(id));
+  const asset = sampleAssets.find((a) => a.id === id);
 
   if (!asset) {
     return (
