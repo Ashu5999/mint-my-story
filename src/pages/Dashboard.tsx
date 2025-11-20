@@ -8,6 +8,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { uploadMediaWithDetails, ipfsToHttp } from "@/utils/ipfs";
+import { useAccount } from "wagmi";
+import { useWeb3Modal } from "@web3modal/wagmi/react";
+import { hasValidProjectId } from "@/config/wallet";
 
 interface DashboardStats {
   totalEarnings: number;
@@ -49,6 +52,8 @@ const Dashboard = () => {
   const [creating, setCreating] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { address, isConnected } = useAccount();
+  const web3Modal = useWeb3Modal();
 
   useEffect(() => {
     checkAuth();
@@ -88,6 +93,18 @@ const Dashboard = () => {
         return;
       }
 
+      if (!isConnected || !address) {
+        toast({
+          title: "Wallet required",
+          description: "Connect your wallet before creating an asset.",
+          variant: "destructive",
+        });
+        if (hasValidProjectId) {
+          web3Modal.open();
+        }
+        return;
+      }
+
       if (!selectedFile) {
         toast({
           title: "No file selected",
@@ -103,7 +120,7 @@ const Dashboard = () => {
       const mediaResults = await uploadMediaWithDetails([selectedFile]);
       const media = mediaResults[0];
 
-      // 2. Store the asset record in Supabase, referencing the IPFS media
+      // 2. Store the asset record in Supabase, referencing the IPFS media and creator wallet
       const priceNumber = parseFloat(createForm.price || "0");
 
       const { error } = await supabase.from('assets').insert({
@@ -116,6 +133,7 @@ const Dashboard = () => {
         metadata: {
           mediaType: media.type,
           ipfsUri: media.uri,
+          creatorWallet: address,
         },
       });
 
@@ -302,9 +320,13 @@ const Dashboard = () => {
                       >
                         Cancel
                       </Button>
-                      <Button type="submit" variant="hero" disabled={creating}>
+                      <Button
+                        type="submit"
+                        variant="hero"
+                        disabled={creating || !isConnected}
+                      >
                         {creating && <Loader2 className="w-4 h-4 animate-spin mr-2" />}
-                        {creating ? "Minting Asset..." : "Confirm & Mint Asset"}
+                        {creating ? "Minting Asset..." : !isConnected ? "Connect wallet to mint" : "Confirm & Mint Asset"}
                       </Button>
                     </div>
                   </form>

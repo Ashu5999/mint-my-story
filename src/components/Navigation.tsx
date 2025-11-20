@@ -1,21 +1,38 @@
 import { Button } from "@/components/ui/button";
-import { Wallet, Menu, LogIn, LogOut, User as UserIcon } from "lucide-react";
+import { Wallet, Menu, LogIn, LogOut, User as UserIcon, AlertTriangle } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useWeb3Modal } from '@web3modal/wagmi/react';
-import { useAccount, useDisconnect } from 'wagmi';
-import { hasValidProjectId } from '@/config/web3';
+import { useAccount, useDisconnect, useBalance, useEnsName, useChainId, useSwitchChain } from 'wagmi';
+import { hasValidProjectId, chains } from '@/config/wallet';
 import { supabase } from "@/integrations/supabase/client";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { User } from "@supabase/supabase-js";
 import { useToast } from "@/hooks/use-toast";
 
+const PRIMARY_CHAIN = chains[0];
+
 export const Navigation = () => {
-  const { open } = hasValidProjectId ? useWeb3Modal() : { open: () => {} };
-  const { address, isConnected } = useAccount();
+  const web3Modal = useWeb3Modal();
+  const { address, isConnected, status } = useAccount();
   const { disconnect } = useDisconnect();
+  const chainId = useChainId();
+  const { switchChain, isPending: isSwitchingChain } = useSwitchChain();
+  const { data: ensName } = useEnsName({ address, chainId: PRIMARY_CHAIN.id });
+  const { data: balance } = useBalance({ address, chainId: PRIMARY_CHAIN.id, query: { enabled: Boolean(address) } });
   const [user, setUser] = useState<User | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  const isOnCorrectChain = useMemo(
+    () => (chainId ? chainId === PRIMARY_CHAIN.id : true),
+    [chainId]
+  );
+
+  const displayAddress = useMemo(() => {
+    if (!address) return '';
+    const addr = address as string;
+    return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
+  }, [address]);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -31,16 +48,20 @@ export const Navigation = () => {
     return () => subscription.unsubscribe();
   }, []);
 
-  const handleWalletAction = () => {
-    if (isConnected) {
-      disconnect();
-    } else {
-      open();
+  const handleConnectClick = () => {
+    if (!hasValidProjectId) {
+      toast({
+        title: "WalletConnect not configured",
+        description: "Please set VITE_WALLETCONNECT_PROJECT_ID in your environment.",
+        variant: "destructive",
+      });
+      return;
     }
+    web3Modal.open();
   };
 
-  const formatAddress = (addr: string) => {
-    return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
+  const handleDisconnectClick = () => {
+    disconnect();
   };
 
   const handleSignOut = async () => {
@@ -81,6 +102,67 @@ export const Navigation = () => {
           </div>
 
           <div className="flex items-center gap-3">
+            {/* Wallet status / connect button */}
+            <div className="hidden md:flex items-center gap-2 mr-2">
+              {isConnected && address ? (
+                <div className="flex items-center gap-2 px-3 py-1.5 glass rounded-full border border-border/60">
+                  <div className="flex flex-col">
+                    <span className="text-xs font-medium">
+                      {ensName || displayAddress}
+                    </span>
+                    <span className="text-[11px] text-muted-foreground flex items-center gap-1">
+                      {balance ? `${Number(balance.formatted).toFixed(4)} ${balance.symbol}` : '—'}
+                      <span className={isOnCorrectChain ? "" : "text-yellow-500 flex items-center gap-1"}>
+                        {!isOnCorrectChain && <AlertTriangle className="w-3 h-3" />}
+                        {PRIMARY_CHAIN.name}
+                      </span>
+                    </span>
+                  </div>
+                  {!isOnCorrectChain && (
+                    <Button
+                      variant="outline"
+                      size="xs"
+                      className="text-[11px] h-7 px-2"
+                      disabled={isSwitchingChain}
+                      onClick={() =>
+                        switchChain({ chainId: PRIMARY_CHAIN.id }, {
+                          onError: (error) => {
+                            console.error('Network switch failed', error);
+                            toast({
+                              title: "Failed to switch network",
+                              description: "Please switch to Sepolia in your wallet manually.",
+                              variant: "destructive",
+                            });
+                          },
+                        })
+                      }
+                    >
+                      {isSwitchingChain ? 'Switching…' : 'Switch to Sepolia'}
+                    </Button>
+                  )}
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="ml-1"
+                    onClick={handleDisconnectClick}
+                    title="Disconnect wallet"
+                  >
+                    <LogOut className="w-4 h-4" />
+                  </Button>
+                </div>
+              ) : (
+                <Button
+                  variant="glass"
+                  size="default"
+                  onClick={handleConnectClick}
+                  disabled={status === 'connecting'}
+                >
+                  <Wallet className="w-4 h-4" />
+                  {status === 'connecting' ? 'Connecting…' : 'Connect Wallet'}
+                </Button>
+              )}
+            </div>
+
             {user ? (
               <>
                 <div className="hidden md:flex items-center gap-2 px-3 py-1.5 glass rounded-full">
@@ -102,9 +184,14 @@ export const Navigation = () => {
                 </Button>
               </Link>
             )}
-            <Button variant="glass" size="default" onClick={handleWalletAction}>
+            {/* Mobile wallet button */}
+            <Button
+              variant="glass"
+              size="default"
+              onClick={isConnected ? handleDisconnectClick : handleConnectClick}
+            >
               <Wallet className="w-4 h-4" />
-              {isConnected && address ? formatAddress(address) : 'Connect Wallet'}
+              {isConnected && address ? (ensName || displayAddress) : 'Wallet'}
             </Button>
             <Button variant="ghost" size="icon" className="md:hidden">
               <Menu className="w-5 h-5" />
