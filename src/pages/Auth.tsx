@@ -91,23 +91,23 @@ export default function Auth() {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: `${window.location.origin}/dashboard`,
+          redirectTo: `${window.location.origin}/auth/callback`,
         },
       });
       if (error) {
         throw error;
       }
-      // If no error, OAuth redirect will happen automatically
+      // If no error, Supabase will redirect to the callback URL
     } catch (error: any) {
       console.error("Google OAuth error:", error);
-      let errorMessage = error.message;
+      let errorMessage = error?.message || "Google sign-in failed. Please try again.";
       
       if (errorMessage.includes("provider is not enabled") || errorMessage.includes("provider not enabled")) {
-        errorMessage = "⚠️ Google sign-in is not set up yet. Please configure it in your backend or use email/password to sign in.";
+        errorMessage = "Google sign-in is not enabled for this project yet. Please enable it in Supabase or use email/password to sign in.";
       }
       
       toast({
-        title: "Google Sign-In Unavailable",
+        title: "Google Sign-In Error",
         description: errorMessage,
         variant: "destructive",
       });

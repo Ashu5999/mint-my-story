@@ -8,11 +8,13 @@ This file provides guidance to WARP (warp.dev) when working with code in this re
 
 - Install dependencies:
   - `npm install`
+- Configure environment variables:
+  - Copy `.env.example` to `.env` and fill in the required keys (`VITE_WALLETCONNECT_PROJECT_ID`, `VITE_NFT_STORAGE_KEY`, and the Supabase variables described below).
 - Start dev server (Vite + React):
   - `npm run dev`
 - Production build:
   - `npm run build`
-  - Development-mode build (faster, with dev config):
+- Development-mode build (faster, with dev config):
   - `npm run build:dev`
 - Preview built app:
   - `npm run preview`
@@ -26,6 +28,9 @@ This file provides guidance to WARP (warp.dev) when working with code in this re
 ### Tests
 
 - There is currently no configured test runner or `npm test` script in `package.json`.
+- If you introduce a test runner (e.g. Vitest, Jest, Playwright), add the corresponding `npm` scripts and update this section with:
+  - How to run the full test suite.
+  - How to run a single test file or focused test.
 
 ## Project architecture
 
@@ -40,9 +45,11 @@ This file provides guidance to WARP (warp.dev) when working with code in this re
     - `Dashboard.tsx` – creator dashboard metrics.
     - `HowItWorksPage.tsx` – expanded explanation of the flow.
     - `NotFound.tsx` – 404 handler; also logs missing routes to `console.error`.
+    - `Auth.tsx` – authentication / onboarding surface.
+    - `AssetDetail.tsx` – detail view for a single IP asset.
 - UI layer:
   - Tailwind CSS (`tailwind.config.ts`, `src/index.css`, `src/App.css`) with shadcn-ui primitives in `src/components/ui/`.
-  - Higher-level layout components in `src/components/` (e.g. `Navigation`, `Hero`, `HowItWorks`, `MarketplacePreview`, `Footer`).
+  - Higher-level layout components in `src/components/` (e.g. `Navigation`, `Hero`, `HowItWorks`, `MarketplacePreview`, `FilterSheet`, `LicenseDialog`, `Footer`).
 
 ### Global providers & configuration
 
@@ -62,6 +69,7 @@ This file provides guidance to WARP (warp.dev) when working with code in this re
 - Supabase integration (`src/integrations/supabase/`):
   - `client.ts` creates a typed Supabase client using `@supabase/supabase-js` and `Database` from `types.ts`.
   - Uses env vars `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` and persists auth to `localStorage`.
+  - The Supabase project itself is defined under `supabase/` (e.g. `config.toml`, `migrations/*.sql`); treat this directory as the source of truth for database schema and policies.
 - IPFS / NFT storage (`src/utils/ipfs.ts`, `src/utils/IPFS_README.md`, `src/utils/ipfs.examples.ts`):
   - `ipfs.ts` is a full-featured module around `nft.storage`:
     - `uploadMedia` and `uploadMediaWithDetails` accept `File | Buffer | Blob` and upload to IPFS, returning `ipfs://` URIs plus media type information.
@@ -82,7 +90,20 @@ This file provides guidance to WARP (warp.dev) when working with code in this re
       - `attachTerms` – attaches existing terms to an asset, probing for `attachTerms` vs `attachLicenseTerms`.
       - `setRoyaltyConfig` – configures royalties using whichever royalty module method exists (`setRoyaltyConfig`, `configureRoyaltyForIp`, etc.), keeping splitting logic centralized.
     - All functions normalize errors via `normalizeError` into a common `StoryError` so callers can rely on `success` and `error` fields without throwing.
+  - This module is server-side only (relies on `process.env` and Node-compatible Story SDK clients) and should be called from API routes or backend code, not directly from browser-only React components.
   - Design expectation: frontend / backend code should treat these helpers as the only touchpoint with the Story SDK (no direct `StoryClient` usage elsewhere), to keep RPC, account, and method-detection logic in one place.
+
+### Backend & Story Protocol API layer
+
+- Next.js-style API routes under `pages/api/` expose Story Protocol operations over HTTP:
+  - `register.ts` – wraps `registerAsset` to mint/register an IP asset using an IPFS metadata URI and optional royalty splits.
+  - `createTerms.ts` – wraps `createTerms` to create license/terms for an existing IP asset.
+  - `attachTerms.ts` – wraps `attachTerms` to attach previously created terms to an asset.
+  - `setRoyalty.ts` – wraps `setRoyaltyConfig` to configure royalty splits for an asset.
+- All handlers:
+  - Accept `POST` JSON bodies validated with `zod`.
+  - Return a consistent response shape with `success` and, on failure, an `error` object containing `code`, `message`, and optional `details`.
+- These routes are expected to run in a Node/Next-like serverless environment where the Story Protocol environment variables (see below) are available via `process.env`.
 
 ### Hooks and utilities
 
@@ -104,9 +125,10 @@ When wiring up Web3, Supabase, IPFS, or Story Protocol, expect to supply these e
 - Supabase:
   - `VITE_SUPABASE_URL`
   - `VITE_SUPABASE_PUBLISHABLE_KEY`
+  - `VITE_SUPABASE_PROJECT_ID` (used by Supabase tooling/hosting; not read directly in app code).
 - IPFS / nft.storage:
   - `VITE_NFT_STORAGE_KEY` (browser) or `NFT_STORAGE_KEY` (Node/server environments)
-- Story Protocol (server-side usage of `src/utils/story.ts`):
+- Story Protocol (server-side usage of `src/utils/story.ts` and `pages/api/*`):
   - `STORY_PRIVATE_KEY`
   - `STORY_TESTNET_RPC`
   - `STORY_REGISTRY_CONTRACT`
@@ -121,6 +143,7 @@ These env vars are used via `import.meta.env` in client code and `process.env` i
 - For new Web3 or Story Protocol flows:
   - Use `Web3Provider` and `config/web3.ts` for wallet connectivity rather than creating new providers.
   - Route all Story Protocol interactions through `src/utils/story.ts`; if a needed SDK method is missing, extend that module instead of calling the SDK directly from components.
+  - When exposing new Story operations over HTTP, add a corresponding handler in `pages/api/` that validates input with `zod` and forwards to the appropriate `src/utils/story.ts` helper.
 - For IPFS-related features:
   - Build on top of `src/utils/ipfs.ts` and the flows in `ipfs.examples.ts`.
   - Update `IPFS_README.md` if the public API of the IPFS module changes.
