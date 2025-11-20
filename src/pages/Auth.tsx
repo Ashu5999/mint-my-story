@@ -97,13 +97,17 @@ export default function Auth() {
       if (error) {
         throw error;
       }
+      // If no error, OAuth redirect will happen automatically
     } catch (error: any) {
+      console.error("Google OAuth error:", error);
       let errorMessage = error.message;
-      if (errorMessage.includes("provider is not enabled")) {
-        errorMessage = "Google sign-in is not configured. Please use email/password or contact support.";
+      
+      if (errorMessage.includes("provider is not enabled") || errorMessage.includes("provider not enabled")) {
+        errorMessage = "⚠️ Google sign-in is not set up yet. Please configure it in your backend or use email/password to sign in.";
       }
+      
       toast({
-        title: "Sign-In Error",
+        title: "Google Sign-In Unavailable",
         description: errorMessage,
         variant: "destructive",
       });
