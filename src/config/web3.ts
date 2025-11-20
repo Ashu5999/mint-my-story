@@ -35,4 +35,4 @@ if (hasValidProjectId) {
   })
 }
 
-export { WagmiProvider, QueryClient }
+export { WagmiProvider, QueryClient, hasValidProjectId }

@@ -3,12 +3,13 @@ import { Wallet, Menu, LogIn } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useWeb3Modal } from '@web3modal/wagmi/react';
 import { useAccount, useDisconnect } from 'wagmi';
+import { hasValidProjectId } from '@/config/web3';
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
 import { User } from "@supabase/supabase-js";
 
 export const Navigation = () => {
-  const { open } = useWeb3Modal();
+  const { open } = hasValidProjectId ? useWeb3Modal() : { open: () => {} };
   const { address, isConnected } = useAccount();
   const { disconnect } = useDisconnect();
   const [user, setUser] = useState<User | null>(null);
