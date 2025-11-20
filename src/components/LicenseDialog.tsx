@@ -8,6 +8,7 @@ import { useAccount } from 'wagmi';
 import { useWeb3Modal } from '@web3modal/wagmi/react';
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
+import { hasValidProjectId } from '@/config/web3';
 
 interface LicenseDialogProps {
   open: boolean;
@@ -26,7 +27,7 @@ interface LicenseDialogProps {
 export const LicenseDialog = ({ open, onOpenChange, asset }: LicenseDialogProps) => {
   const { toast } = useToast();
   const { address, isConnected } = useAccount();
-  const { open: openWalletModal } = useWeb3Modal();
+  const { open: openWalletModal } = hasValidProjectId ? useWeb3Modal() : { open: () => {} };
   const [loading, setLoading] = useState(false);
 
   const handlePurchase = async () => {
