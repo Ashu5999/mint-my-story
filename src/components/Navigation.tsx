@@ -180,10 +180,7 @@ export const Navigation = () => {
               </>
             ) : (
               <Link to="/auth">
-                <Button variant="glass" size="default">
-                  <LogIn className="w-4 h-4" />
-                  Sign In
-                </Button>
+                
               </Link>
             )}
             {/* Mobile wallet button */}
