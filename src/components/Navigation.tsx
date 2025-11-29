@@ -37,6 +37,8 @@ export const Navigation = () => {
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
+    }).catch((error) => {
+      console.error("Error getting session:", error);
     });
 
     const {
@@ -88,7 +90,7 @@ export const Navigation = () => {
             <div className="w-8 h-8 bg-gradient-to-br from-brand-purple to-brand-blue rounded-lg" />
             <span className="text-xl font-bold gradient-text">Mint2Story</span>
           </Link>
-          
+
           <div className="hidden md:flex items-center gap-8">
             <Link to="/marketplace" className="text-foreground/80 hover:text-foreground transition-smooth">
               Marketplace

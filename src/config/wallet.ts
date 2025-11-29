@@ -16,7 +16,7 @@ export const chains = [sepolia] as [Chain, ...Chain[]]
 const metadata = {
   name: 'Mint2Story',
   description: 'Transform your stories into on-chain IP assets',
-  url: 'https://mint2story.com',
+  url: typeof window !== 'undefined' ? window.location.origin : 'https://mint2story.com',
   icons: ['https://avatars.githubusercontent.com/u/37784886']
 }
 
@@ -27,11 +27,10 @@ export const config = defaultWagmiConfig({
   metadata
 })
 
-// Initialize Web3Modal at root import time (guarded by projectId)
-if (hasValidProjectId) {
-  createWeb3Modal({
-    wagmiConfig: config,
-    projectId: projectId!,
-    chains
-  })
-}
+// Initialize Web3Modal at root import time
+// We must initialize this even if projectId is missing to prevent useWeb3Modal hook from crashing
+createWeb3Modal({
+  wagmiConfig: config,
+  projectId: projectId ?? 'missing_project_id',
+  chains
+})
