@@ -68,8 +68,13 @@ export const Navigation = () => {
 
   const handleSignOut = async () => {
     try {
+      // 1. Disconnect wallet
+      disconnect();
+
+      // 2. Sign out from Supabase
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
+
       navigate("/auth");
       toast({ title: "Signed out successfully" });
     } catch (error: any) {
