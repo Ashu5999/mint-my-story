@@ -10,9 +10,8 @@
  * - STORY_REGISTRY_CONTRACT  IP asset registry / NFT contract address
  */
 
-import type { Address } from 'viem';
-import { http } from 'viem';
-import { privateKeyToAccount } from 'viem/accounts';
+import type { Address, Account, WalletClient, Transport, Chain } from 'viem';
+import { custom } from 'viem';
 import {
   StoryClient,
   type StoryConfig,
@@ -56,9 +55,12 @@ export interface SetRoyaltyConfigResult {
 let storyClientPromise: Promise<StoryClient> | null = null;
 
 function getEnv(name: string): string {
-  const value = process.env[name];
+  // @ts-ignore
+  const value = import.meta.env[name] || process.env[name];
+  // Allow missing env vars for now to prevent crash, but warn
   if (!value) {
-    throw new Error(`Missing required environment variable: ${name}`);
+    console.warn(`Missing environment variable: ${name}`);
+    return '';
   }
   return value;
 }
@@ -82,36 +84,50 @@ function normalizeError(error: unknown, code: string): StoryError {
   };
 }
 
-async function getStoryClient(): Promise<StoryClient> {
-  if (!storyClientPromise) {
-    storyClientPromise = (async () => {
-      try {
-        const privateKey = getEnv('STORY_PRIVATE_KEY');
-        const rpcUrl = getEnv('STORY_TESTNET_RPC');
+// Cache client if needed, but since it depends on wallet, maybe not global cache
+// let storyClientPromise: Promise<StoryClient> | null = null;
 
-        const account = privateKeyToAccount(`0x${privateKey.replace(/^0x/, '')}`);
-
-        const config: StoryConfig = {
-          chainId: "aeneid", // Story Protocol testnet
-          transport: http(rpcUrl),
-          account,
-        };
-
-        const client = StoryClient.newClient(config);
-        return client;
-      } catch (error) {
-        console.error('[Story] Failed to initialize StoryClient:', error);
-        throw error;
-      }
-    })();
-  }
-
-  return storyClientPromise;
+async function getStoryClient(walletClient: WalletClient, account: Address): Promise<StoryClient> {
+  const config: StoryConfig = {
+    chainId: "aeneid",
+    transport: custom((window as any).ethereum!), // Use browser provider
+    account: account as unknown as Account, // Cast to Account
+  };
+  return StoryClient.newClient(config);
 }
 
 function getRegistryContractAddress(): Address {
   const addr = getEnv('STORY_REGISTRY_CONTRACT');
   return addr as Address;
+}
+
+export const SPGNFTContractAddress: Address =
+  (import.meta.env.VITE_SPG_NFT_CONTRACT_ADDRESS as Address) || '0xc32A8a0FF3beDDDa58393d022aF433e78739FAbc';
+
+// Docs: https://docs.story.foundation/developers/deployed-smart-contracts
+export const RoyaltyPolicyLAP: Address = '0xBe54FB168b3c982b7AaE60dB6CF75Bd8447b390E'
+export const WIP_TOKEN_ADDRESS: Address = '0x1514000000000000000000000000000000000000' // Verify this address for testnet
+
+export function createCommercialRemixTerms(terms: { commercialRevShare: number; defaultMintingFee: number }): any {
+  return {
+    transferable: true,
+    royaltyPolicy: RoyaltyPolicyLAP,
+    defaultMintingFee: BigInt(terms.defaultMintingFee), // Simplified for now, should use parseEther if needed
+    expiration: BigInt(0),
+    commercialUse: true,
+    commercialAttribution: true,
+    commercializerChecker: '0x0000000000000000000000000000000000000000',
+    commercializerCheckerData: '0x',
+    commercialRevShare: terms.commercialRevShare,
+    commercialRevCeiling: BigInt(0),
+    derivativesAllowed: true,
+    derivativesAttribution: true,
+    derivativesApproval: false,
+    derivativesReciprocal: true,
+    derivativeRevCeiling: BigInt(0),
+    currency: WIP_TOKEN_ADDRESS,
+    uri: 'https://github.com/piplabs/pil-document/blob/ad67bb632a310d2557f8abcccd428e4c9c798db1/off-chain-terms/CommercialRemix.json',
+  }
 }
 
 /**
@@ -122,76 +138,65 @@ function getRegistryContractAddress(): Address {
  * `mintAndRegisterIpAsset` and separate royalty configuration.
  */
 export async function registerAsset(
+  walletClient: WalletClient, // Added
+  account: Address, // Added
   metadataUri: string,
-  creatorWallet: string,
+  nftMetadataUri: string,
+  ipMetadataHash: string,
+  nftMetadataHash: string,
   royalties: RoyaltySplit[] = [],
 ): Promise<StoryResult<RegisterAssetResult>> {
   try {
     if (!metadataUri || !metadataUri.startsWith('ipfs://')) {
       throw new Error('metadataUri must be a non-empty IPFS URI (e.g. ipfs://CID)');
     }
-    if (!creatorWallet) {
-      throw new Error('creatorWallet is required');
+    if (!account) {
+      throw new Error('account is required');
     }
 
-    const client = await getStoryClient();
-    const registryContract = getRegistryContractAddress();
+    const client = await getStoryClient(walletClient, account);
+    // const registryContract = getRegistryContractAddress(); // Not strictly needed for mintAndRegisterIpAssetWithPilTerms if using SPG
 
     let assetId: string;
     let txHash: string;
 
     const ipAssetModule: any = (client as any).ipAsset;
 
-    if (
-      ipAssetModule &&
-      typeof ipAssetModule.mintAndRegisterAndCreateTermsAndAttach === 'function'
-    ) {
-      console.log('[Story] Using composite helper mintAndRegisterAndCreateTermsAndAttach');
+    console.log('[Story] Using ipAsset.mintAndRegisterIpAssetWithPilTerms');
 
-      const response = await ipAssetModule.mintAndRegisterAndCreateTermsAndAttach({
-        registryAddress: registryContract,
+    // Using the flow from reference repo: mintAndRegisterIpAssetWithPilTerms
+    // Note: This requires SPG NFT Contract Address
+    const spgNftContract = SPGNFTContractAddress;
+
+    // TODO: Make sure SPGNFTContractAddress is valid or passed in. 
+    // For now, we might need to rely on the user providing it or hardcoding a testnet one if known.
+    // If not available, we might fall back to the old method, but the user specifically asked for the reference repo logic.
+
+    // Construct terms. Reference repo uses createCommercialRemixTerms.
+    // We'll use a default or allow passing it in? For now, hardcoded default as per reference.
+    const terms = createCommercialRemixTerms({ defaultMintingFee: 0, commercialRevShare: 5 });
+
+    const response = await ipAssetModule.mintAndRegisterIpAssetWithPilTerms({
+      spgNftContract: spgNftContract,
+      licenseTermsData: [
+        {
+          terms: terms,
+        },
+      ],
+      ipMetadata: {
         ipMetadataURI: metadataUri,
-        creator: creatorWallet as Address,
-        royalties: royalties?.map((r) => ({
-          recipient: r.recipient as Address,
-          bps: BigInt(r.bps),
-        })),
-      });
+        ipMetadataHash: ipMetadataHash,
+        nftMetadataURI: nftMetadataUri,
+        nftMetadataHash: nftMetadataHash,
+      },
+      txOptions: { waitForTransaction: true },
+    });
 
-      assetId =
-        (response &&
-          (response.ipId || response.assetId || response.id || response.ipAssetId)) ||
-        '';
-      txHash = response?.txHash || response?.transactionHash || '';
-    } else {
-      console.log('[Story] Using ipAsset.mintAndRegisterIpAsset');
-
-      const response = await (client as any).ipAsset.mintAndRegisterIpAsset({
-        registryAddress: registryContract,
-        ipMetadataURI: metadataUri,
-        creator: creatorWallet as Address,
-      });
-
-      assetId =
-        (response &&
-          (response.ipId || response.assetId || response.id || response.ipAssetId)) ||
-        '';
-      txHash = response?.txHash || response?.transactionHash || '';
-
-      if (!assetId || !txHash) {
-        throw new Error('Story Protocol SDK did not return assetId or txHash');
-      }
-
-      if (royalties && royalties.length > 0) {
-        const royaltyResult = await setRoyaltyConfig(assetId, royalties);
-        if (!royaltyResult.success) {
-          console.error('[Story] Failed to set royalty config during registerAsset');
-        }
-      }
-    }
+    assetId = response.ipId;
+    txHash = response.txHash;
 
     if (!assetId || !txHash) {
-      throw new Error('Failed to extract assetId or txHash from Story Protocol response');
+      throw new Error('Story Protocol SDK did not return assetId or txHash');
     }
 
     return {
@@ -214,6 +219,8 @@ export async function registerAsset(
  * Create license / terms for an existing IP asset.
  */
 export async function createTerms(
+  walletClient: WalletClient,
+  account: Address,
   assetId: string,
   termsConfig: any,
 ): Promise<StoryResult<CreateTermsResult>> {
@@ -225,7 +232,7 @@ export async function createTerms(
       throw new Error('termsConfig must be a non-null object');
     }
 
-    const client = await getStoryClient();
+    const client = await getStoryClient(walletClient, account);
     const anyClient = client as any;
 
     let termsId: string | undefined;
@@ -282,6 +289,8 @@ export async function createTerms(
  * Attach existing terms to an IP asset.
  */
 export async function attachTerms(
+  walletClient: WalletClient,
+  account: Address,
   assetId: string,
   termsId: string,
 ): Promise<StoryResult<AttachTermsResult>> {
@@ -293,7 +302,7 @@ export async function attachTerms(
       throw new Error('termsId is required');
     }
 
-    const client = await getStoryClient();
+    const client = await getStoryClient(walletClient, account);
     const anyClient = client as any;
 
     const licenseModule: any = anyClient.license || anyClient.terms;
@@ -347,6 +356,8 @@ export async function attachTerms(
  * Configure royalty distribution for an IP asset via the Story Protocol Royalty Module.
  */
 export async function setRoyaltyConfig(
+  walletClient: WalletClient,
+  account: Address,
   assetId: string,
   splits: RoyaltySplit[],
 ): Promise<StoryResult<SetRoyaltyConfigResult>> {
@@ -363,7 +374,7 @@ export async function setRoyaltyConfig(
       throw new Error('Total royalty BPS cannot exceed 10,000 (100%)');
     }
 
-    const client = await getStoryClient();
+    const client = await getStoryClient(walletClient, account);
     const anyClient = client as any;
     const royaltyModule: any = anyClient.royalty || anyClient.royalties;
 

@@ -101,6 +101,9 @@ export const Navigation = () => {
             <Link to="/how-it-works" className="text-foreground/80 hover:text-foreground transition-smooth">
               How It Works
             </Link>
+            <Link to="/create-ip" className="text-foreground/80 hover:text-foreground transition-smooth">
+              Create IP
+            </Link>
           </div>
 
           <div className="flex items-center gap-3">
@@ -180,7 +183,7 @@ export const Navigation = () => {
               </>
             ) : (
               <Link to="/auth">
-                
+
               </Link>
             )}
             {/* Mobile wallet button */}

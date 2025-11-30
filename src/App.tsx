@@ -10,6 +10,7 @@ import HowItWorksPage from "./pages/HowItWorksPage";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 import AuthCallback from "./pages/AuthCallback";
+import CreateIP from "./pages/CreateIP";
 
 const App = () => (
   <TooltipProvider>
@@ -24,6 +25,7 @@ const App = () => (
         <Route path="/how-it-works" element={<HowItWorksPage />} />
         <Route path="/auth" element={<Auth />} />
         <Route path="/auth/callback" element={<AuthCallback />} />
+        <Route path="/create-ip" element={<CreateIP />} />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>
