@@ -58,22 +58,23 @@ export const Hero = () => {
         <div className="max-w-4xl mx-auto text-center space-y-8">
           {/* Main headline */}
           <h1 className="text-5xl md:text-7xl lg:text-8xl font-light tracking-tight leading-[0.95]">
-            <span className="block text-foreground/90">AI-native</span>
-            <span className="block text-foreground/90">Infrastructure for</span>
-            <span className="block text-foreground">Creative IP</span>
+            <span className="block text-foreground/90">Transform Your</span>
+            <span className="block gradient-text">Instagram Stories</span>
+            <span className="block text-foreground">Into Licensed IP</span>
           </h1>
 
           {/* Subtitle */}
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed font-light">
-            Transform your creative content into blockchain-verified IP assets. 
-            Mint, license, and monetize with programmable ownership and automated royalties.
+            Mint your creative content as blockchain-verified IP assets. 
+            Set licensing terms, automate royalties, and monetize your creativity 
+            with immutable on-chain protection.
           </p>
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-8">
             <Link to="/dashboard">
               <Button className="btn-pill btn-pill-primary min-w-[180px] h-14 text-base">
-                Start Building
+                Start Minting Now
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
             </Link>
