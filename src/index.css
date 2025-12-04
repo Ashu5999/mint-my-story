@@ -122,6 +122,99 @@
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
+  /* ===== GOD-LEVEL BUTTON EFFECTS ===== */
+  
+  /* Shimmer/shine effect on hover */
+  .btn-shine::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.3),
+      transparent
+    );
+    transition: left 0.5s ease;
+  }
+
+  .btn-shine:hover::before {
+    left: 100%;
+  }
+
+  /* Animated border glow */
+  .btn-border-glow {
+    position: relative;
+  }
+
+  .btn-border-glow::after {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: inherit;
+    background: linear-gradient(
+      45deg,
+      transparent,
+      hsl(200 100% 50% / 0),
+      transparent,
+      hsl(200 100% 50% / 0)
+    );
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .btn-border-glow:hover::after {
+    opacity: 1;
+    background: linear-gradient(
+      45deg,
+      hsl(200 100% 50% / 0.3),
+      hsl(260 100% 60% / 0.3),
+      hsl(200 100% 50% / 0.3),
+      hsl(260 100% 60% / 0.3)
+    );
+    background-size: 300% 300%;
+    animation: gradient-rotate 2s linear infinite;
+  }
+
+  @keyframes gradient-rotate {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  /* Pulse glow effect */
+  .btn-pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+
+  .btn-pulse-glow:hover {
+    animation: none;
+    box-shadow: 
+      0 0 20px hsl(0 0% 100% / 0.4),
+      0 0 40px hsl(200 100% 50% / 0.3),
+      0 0 60px hsl(200 100% 50% / 0.2);
+  }
+
+  @keyframes pulse-glow {
+    0%, 100% {
+      box-shadow: 0 0 20px hsl(0 0% 100% / 0.2);
+    }
+    50% {
+      box-shadow: 0 0 30px hsl(0 0% 100% / 0.4), 0 0 50px hsl(200 100% 50% / 0.2);
+    }
+  }
+
+  /* Magnetic hover effect helper */
+  .btn-magnetic {
+    transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  /* ===== EXISTING STYLES ===== */
+
   /* Story-style 3D shapes background */
   .story-bg {
     position: relative;
@@ -189,11 +282,44 @@
   }
 
   .btn-pill-primary {
-    @apply bg-foreground text-background hover:bg-foreground/90;
+    @apply bg-foreground text-background relative overflow-hidden;
+  }
+
+  .btn-pill-primary::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.4),
+      transparent
+    );
+    transition: left 0.6s ease;
+  }
+
+  .btn-pill-primary:hover::before {
+    left: 100%;
+  }
+
+  .btn-pill-primary:hover {
+    transform: scale(1.05);
+    box-shadow: 
+      0 0 30px hsl(0 0% 100% / 0.3),
+      0 0 60px hsl(200 100% 50% / 0.2);
   }
 
   .btn-pill-secondary {
-    @apply bg-secondary border border-border text-foreground hover:bg-secondary/80;
+    @apply bg-secondary border border-border text-foreground;
+  }
+
+  .btn-pill-secondary:hover {
+    transform: scale(1.05);
+    border-color: hsl(var(--foreground) / 0.3);
+    box-shadow: 0 0 30px hsl(200 100% 50% / 0.15);
   }
 
   /* Card styles */
