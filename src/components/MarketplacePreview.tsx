@@ -1,8 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { ExternalLink, TrendingUp } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 const sampleAssets = [
   {
@@ -36,57 +35,58 @@ const sampleAssets = [
 
 export const MarketplacePreview = () => {
   return (
-    <section className="py-24 relative">
-      <div className="absolute inset-0 bg-gradient-to-b from-background via-card/20 to-background" />
-      
-      <div className="container mx-auto px-6 relative z-10">
-        <div className="text-center mb-12">
-          <Badge className="mb-4" variant="outline">
-            <TrendingUp className="w-3 h-3 mr-1" />
-            Marketplace
-          </Badge>
-          <h2 className="text-4xl md:text-5xl font-bold mb-4">
-            Discover <span className="gradient-text">Licensed Content</span>
+    <section className="py-32 relative story-bg">
+      <div className="container mx-auto px-6">
+        {/* Header */}
+        <div className="text-center mb-16">
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-light tracking-tight mb-6">
+            Featured IP Assets
           </h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Browse and license premium creator content with transparent terms
+          <p className="text-lg text-muted-foreground max-w-xl mx-auto font-light">
+            Discover and license premium creator content with transparent terms
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+        {/* Assets Grid */}
+        <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
           {sampleAssets.map((asset) => (
             <Card
               key={asset.id}
-              className="glass card-3d border-border/50 overflow-hidden group hover:border-primary/50 transition-smooth"
+              className="group bg-card/50 border border-border/50 rounded-3xl overflow-hidden hover:border-border transition-all duration-500 hover:-translate-y-2"
             >
-              <div className="aspect-square overflow-hidden tilt-soft">
+              {/* Image */}
+              <div className="aspect-square overflow-hidden">
                 <img
                   src={asset.image}
                   alt={asset.title}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-smooth duration-500"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                 />
               </div>
-              <CardContent className="p-4 space-y-3">
+
+              {/* Content */}
+              <CardContent className="p-6 space-y-4">
                 <div className="flex items-start justify-between gap-2">
                   <div>
-                    <h3 className="font-semibold line-clamp-1">{asset.title}</h3>
+                    <h3 className="font-medium text-foreground line-clamp-1">{asset.title}</h3>
                     <p className="text-sm text-muted-foreground">{asset.creator}</p>
                   </div>
-                  <Badge variant="secondary">{asset.category}</Badge>
+                  <span className="text-xs px-3 py-1 rounded-full bg-secondary text-muted-foreground">
+                    {asset.category}
+                  </span>
                 </div>
                 
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between pt-2 border-t border-border/50">
                   <div>
                     <p className="text-xs text-muted-foreground">License from</p>
-                    <p className="text-lg font-bold text-brand-purple">{asset.price}</p>
+                    <p className="text-lg font-medium text-foreground">{asset.price}</p>
                   </div>
-                  <p className="text-xs text-muted-foreground">{asset.licenses} licenses sold</p>
+                  <p className="text-xs text-muted-foreground">{asset.licenses} sold</p>
                 </div>
 
                 <Link to={`/marketplace/${asset.id}`}>
-                  <Button variant="outline" className="w-full group/btn">
+                  <Button variant="outline" className="w-full">
                     View Details
-                    <ExternalLink className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
+                    <ArrowRight className="w-4 h-4" />
                   </Button>
                 </Link>
               </CardContent>
@@ -94,10 +94,12 @@ export const MarketplacePreview = () => {
           ))}
         </div>
 
-        <div className="text-center mt-12">
+        {/* CTA */}
+        <div className="text-center mt-16">
           <Link to="/marketplace">
-            <Button variant="hero" size="lg">
+            <Button size="lg" className="min-w-[200px]">
               Explore Marketplace
+              <ArrowRight className="w-4 h-4" />
             </Button>
           </Link>
         </div>

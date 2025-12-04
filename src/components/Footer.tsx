@@ -1,63 +1,66 @@
+import { Link } from "react-router-dom";
 import { Github, Twitter, MessageCircle } from "lucide-react";
 
 export const Footer = () => {
   return (
-    <footer className="border-t border-border/50 py-12 mt-24">
+    <footer className="py-16 border-t border-border/30 bg-background">
       <div className="container mx-auto px-6">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-          <div>
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 bg-gradient-to-br from-brand-purple to-brand-blue rounded-lg" />
-              <span className="text-xl font-bold gradient-text">Mint2Story</span>
-            </div>
-            <p className="text-sm text-muted-foreground">
-              Turn Instagram content into licensed IP assets powered by Story Protocol.
+        <div className="grid md:grid-cols-4 gap-12 mb-12">
+          {/* Brand */}
+          <div className="md:col-span-1">
+            <Link to="/" className="text-xl font-semibold tracking-tight">
+              Mint2Story
+            </Link>
+            <p className="mt-4 text-sm text-muted-foreground font-light leading-relaxed">
+              Transform creative content into blockchain-verified IP assets with programmable licensing.
             </p>
           </div>
 
+          {/* Product */}
           <div>
-            <h4 className="font-semibold mb-4">Product</h4>
-            <ul className="space-y-2 text-sm text-muted-foreground">
-              <li><a href="#" className="hover:text-foreground transition-smooth">Marketplace</a></li>
-              <li><a href="#" className="hover:text-foreground transition-smooth">Dashboard</a></li>
-              <li><a href="#" className="hover:text-foreground transition-smooth">Chrome Extension</a></li>
-              <li><a href="#" className="hover:text-foreground transition-smooth">Pricing</a></li>
+            <h4 className="text-sm font-medium mb-4 text-foreground">Product</h4>
+            <ul className="space-y-3">
+              <FooterLink to="/marketplace">Marketplace</FooterLink>
+              <FooterLink to="/dashboard">Dashboard</FooterLink>
+              <FooterLink to="/create-ip">Create IP</FooterLink>
+              <FooterLink to="/how-it-works">How It Works</FooterLink>
             </ul>
           </div>
 
+          {/* Resources */}
           <div>
-            <h4 className="font-semibold mb-4">Resources</h4>
-            <ul className="space-y-2 text-sm text-muted-foreground">
-              <li><a href="#" className="hover:text-foreground transition-smooth">Documentation</a></li>
-              <li><a href="#" className="hover:text-foreground transition-smooth">API Reference</a></li>
-              <li><a href="#" className="hover:text-foreground transition-smooth">Support</a></li>
-              <li><a href="#" className="hover:text-foreground transition-smooth">Blog</a></li>
+            <h4 className="text-sm font-medium mb-4 text-foreground">Resources</h4>
+            <ul className="space-y-3">
+              <FooterLink to="#">Documentation</FooterLink>
+              <FooterLink to="#">API Reference</FooterLink>
+              <FooterLink to="#">Developer Guide</FooterLink>
             </ul>
           </div>
 
+          {/* Legal */}
           <div>
-            <h4 className="font-semibold mb-4">Legal</h4>
-            <ul className="space-y-2 text-sm text-muted-foreground">
-              <li><a href="#" className="hover:text-foreground transition-smooth">Privacy Policy</a></li>
-              <li><a href="#" className="hover:text-foreground transition-smooth">Terms of Service</a></li>
-              <li><a href="#" className="hover:text-foreground transition-smooth">Cookie Policy</a></li>
+            <h4 className="text-sm font-medium mb-4 text-foreground">Legal</h4>
+            <ul className="space-y-3">
+              <FooterLink to="#">Privacy Policy</FooterLink>
+              <FooterLink to="#">Terms of Service</FooterLink>
             </ul>
           </div>
         </div>
 
-        <div className="pt-8 border-t border-border/50 flex flex-col md:flex-row items-center justify-between gap-4">
+        {/* Bottom */}
+        <div className="pt-8 border-t border-border/30 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-sm text-muted-foreground">
-            © 2025 Mint2Story. All rights reserved.
+            © {new Date().getFullYear()} Mint2Story. All rights reserved.
           </p>
           
           <div className="flex items-center gap-4">
-            <a href="#" className="w-10 h-10 glass rounded-full flex items-center justify-center hover:bg-card/80 transition-smooth">
+            <a href="#" className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center hover:bg-secondary/80 transition-colors">
               <Twitter className="w-4 h-4" />
             </a>
-            <a href="#" className="w-10 h-10 glass rounded-full flex items-center justify-center hover:bg-card/80 transition-smooth">
+            <a href="#" className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center hover:bg-secondary/80 transition-colors">
               <Github className="w-4 h-4" />
             </a>
-            <a href="#" className="w-10 h-10 glass rounded-full flex items-center justify-center hover:bg-card/80 transition-smooth">
+            <a href="#" className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center hover:bg-secondary/80 transition-colors">
               <MessageCircle className="w-4 h-4" />
             </a>
           </div>
@@ -66,3 +69,14 @@ export const Footer = () => {
     </footer>
   );
 };
+
+const FooterLink = ({ to, children }: { to: string; children: React.ReactNode }) => (
+  <li>
+    <Link 
+      to={to} 
+      className="text-sm text-muted-foreground hover:text-foreground transition-colors font-light"
+    >
+      {children}
+    </Link>
+  </li>
+);
