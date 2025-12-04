@@ -1,7 +1,6 @@
 import { createWeb3Modal } from '@web3modal/wagmi/react'
 import { defaultWagmiConfig } from '@web3modal/wagmi/react/config'
 import { sepolia } from 'wagmi/chains'
-import type { Chain } from 'wagmi'
 
 // WalletConnect project ID from env
 const projectId = import.meta.env.VITE_WALLETCONNECT_PROJECT_ID as string | undefined
@@ -11,7 +10,7 @@ export const hasValidProjectId = Boolean(
 )
 
 // Primary chain configuration (Sepolia)
-export const chains = [sepolia] as [Chain, ...Chain[]]
+export const chains = [sepolia] as const
 
 const metadata = {
   name: 'Mint2Story',
@@ -28,9 +27,7 @@ export const config = defaultWagmiConfig({
 })
 
 // Initialize Web3Modal at root import time
-// We must initialize this even if projectId is missing to prevent useWeb3Modal hook from crashing
 createWeb3Modal({
   wagmiConfig: config,
-  projectId: projectId ?? 'missing_project_id',
-  chains
+  projectId: projectId ?? 'missing_project_id'
 })

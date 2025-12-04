@@ -1,64 +1,66 @@
-import { Instagram, Coins, DollarSign } from "lucide-react";
+import { Upload, FileSignature, Coins } from "lucide-react";
 
 const steps = [
   {
-    icon: Instagram,
+    icon: Upload,
     number: "01",
-    title: "Browse Your Instagram",
-    description: "View your posts, reels, and stories. Select content you want to monetize.",
+    title: "Upload Content",
+    description: "Connect your Instagram or upload creative content directly. Your stories become the foundation of your IP portfolio."
+  },
+  {
+    icon: FileSignature,
+    number: "02", 
+    title: "Set License Terms",
+    description: "Define how others can use your IP. Set pricing, duration, and restrictions with smart contracts."
   },
   {
     icon: Coins,
-    number: "02",
-    title: "Mint as IP Asset",
-    description: "One-click minting to Story Protocol. Set licensing terms and royalty splits.",
-  },
-  {
-    icon: DollarSign,
     number: "03",
     title: "Earn Royalties",
-    description: "Automated micropayments when brands license your content. Track everything.",
-  },
+    description: "Every license, remix, and derivative work automatically generates royalties sent directly to your wallet."
+  }
 ];
 
 export const HowItWorks = () => {
   return (
-    <section className="py-24 relative">
+    <section className="py-32 relative story-bg">
       <div className="container mx-auto px-6">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold mb-4">
-            How It <span className="gradient-text">Works</span>
+        {/* Header */}
+        <div className="text-center mb-20">
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-light tracking-tight mb-6">
+            How It Works
           </h2>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            From Instagram to licensed IP asset in three simple steps
+          <p className="text-lg text-muted-foreground max-w-xl mx-auto font-light">
+            Three simple steps to transform your creativity into programmable IP
           </p>
         </div>
 
-        <div className="max-w-5xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
-            {/* Connection Lines */}
-            <div className="hidden md:block absolute top-24 left-0 right-0 h-0.5 bg-gradient-to-r from-brand-purple via-brand-blue to-brand-purple opacity-20" />
-
-            {steps.map((step, index) => (
-              <div key={index} className="relative">
-                <div className="glass card-3d p-8 rounded-2xl hover:bg-card/80 transition-smooth group">
-                  {/* Number Badge */}
-                  <div className="absolute -top-4 -left-4 w-12 h-12 bg-gradient-to-br from-brand-purple to-brand-blue rounded-xl flex items-center justify-center font-bold text-lg shadow-lg group-hover:scale-110 transition-smooth tilt-soft">
-                    {step.number}
-                  </div>
-
-                  {/* Icon */}
-                  <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-smooth tilt-soft">
-                    <step.icon className="w-8 h-8 text-brand-purple" />
-                  </div>
-
-                  {/* Content */}
-                  <h3 className="text-xl font-semibold mb-3">{step.title}</h3>
-                  <p className="text-muted-foreground">{step.description}</p>
-                </div>
+        {/* Steps Grid */}
+        <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+          {steps.map((step, index) => (
+            <div 
+              key={index}
+              className="group relative p-8 rounded-3xl bg-card/50 border border-border/50 hover:border-border transition-all duration-500 hover:-translate-y-2"
+            >
+              {/* Step number */}
+              <div className="text-6xl font-light text-muted/30 mb-6">
+                {step.number}
               </div>
-            ))}
-          </div>
+
+              {/* Icon */}
+              <div className="w-12 h-12 rounded-2xl bg-secondary flex items-center justify-center mb-6 group-hover:bg-primary group-hover:text-background transition-colors duration-300">
+                <step.icon className="w-6 h-6" />
+              </div>
+
+              {/* Content */}
+              <h3 className="text-xl font-medium mb-3 text-foreground">
+                {step.title}
+              </h3>
+              <p className="text-muted-foreground font-light leading-relaxed">
+                {step.description}
+              </p>
+            </div>
+          ))}
         </div>
       </div>
     </section>
